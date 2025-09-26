@@ -1,6 +1,7 @@
 
 class Node:
-    def __init__(self,value):
+    def __init__(self,key,value):
+        self.key=key
         self.value=value
         self.Next=None
 
@@ -12,30 +13,30 @@ class LinkedList:
         self.head=None
         self.tail=None
     
-    def addHead(self,value):
+    def addHead(self,key,value):
         '''
         Insert a node at the head of our linked list
         '''
         if self.head==None:
-            self.head=Node(value)
+            self.head=Node(key,value)
             self.tail=self.head
         else:
-            newObject=Node(value)
+            newObject=Node(key,value)
             newObject.Next=self.head
             self.head=newObject
 
-    def addTail(self,value):
+    def addTail(self,key,value):
         '''
         Insert a node at the tail of our linked list
         '''
         if self.head==None:
-            self.addHead(value)
+            self.addHead(key,value)
         else:
-            newObjectToAdd= Node(value)
+            newObjectToAdd= Node(key,value)
             self.tail.Next=newObjectToAdd
             self.tail=newObjectToAdd
     
-    def get(self,index):
+    def get(self,index)->int:
         '''
         Based on a particular index, retrieve the number located at that position on our linked list
         '''
@@ -48,7 +49,7 @@ class LinkedList:
             currentNode=currentNode.Next
             indexToSearch+=1
 
-    def addAtIndex(self,index,value):
+    def addAtIndex(self,index,key,value):
         '''
         Inserts a node at the given index (shifts existing elements to the right).
         '''
@@ -65,7 +66,7 @@ class LinkedList:
         
         while  currentNode!=None :
             if indexToSearch==index:
-                objectToAdd= Node (value)
+                objectToAdd= Node (key,value)
                 previouscurrentNode.Next=objectToAdd
                 objectToAdd.Next=currentNode
                 return
@@ -123,7 +124,7 @@ class LinkedList:
         currentNode=self.head
 
         while currentNode!=None:
-            print(str(currentNode.value) + "(" + str(id(currentNode)) + ")" + "->" ,end="")
+            print(str(currentNode.keyValuePair) + "(" + str(id(currentNode)) + ")" + "->" ,end="")
             currentNode=currentNode.Next
         print()
 
@@ -131,14 +132,14 @@ class LinkedList:
 if __name__=="__main__":
     MynewLinkedList= LinkedList()
 
-    MynewLinkedList.addHead(0)
+    MynewLinkedList.addHead("h",0)
     MynewLinkedList.printLinkedList()
-    MynewLinkedList.addHead(-1)
+    MynewLinkedList.addHead("o",-1)
     MynewLinkedList.printLinkedList()
-    MynewLinkedList.addTail(6)
-    MynewLinkedList.addTail(7)
+    MynewLinkedList.addTail("l",6)
+    MynewLinkedList.addTail("a",7)
     MynewLinkedList.printLinkedList()
-    MynewLinkedList.addAtIndex(2,6.5)
+    MynewLinkedList.addAtIndex(2,"l",6.5)
     MynewLinkedList.printLinkedList()
     MynewLinkedList.deleteAtIndex(0)
     MynewLinkedList.printLinkedList()

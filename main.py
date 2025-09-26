@@ -3,8 +3,7 @@ from SimpleLinkedList import LinkedList
 class PersonalDictionary:
 
     def __init__(self):
-        self.listOfObjPosition=[]
-        self.listOfHashObj=[]
+        self.listOfObj=[]
 
     def HashFunction(self,valToHash:str)->int:
         hashFunction=0
@@ -12,12 +11,13 @@ class PersonalDictionary:
             hashFunction+=ord(char)
         return hashFunction
     
-    def searchForHash(self,hashToSearch:int)->bool:
+    def findIndexOfBucket(self,hashToSearch:int)->bool:
         valuetoSearch=-1
         indextoReturn=-1
-        for index,objHash in enumerate(self.listOfHashObj):
-            if objHash==hashToSearch:
-                valuetoSearch=objHash
+        for index,obj in enumerate(self.listOfObj):
+            hashedObjectSearched=self.HashFunction(obj.head.key)
+            if hashedObjectSearched==hashToSearch:
+                valuetoSearch=hashedObjectSearched
                 indextoReturn=index
 
         return (True if valuetoSearch!=-1 else False, indextoReturn)
@@ -27,38 +27,47 @@ class PersonalDictionary:
     def addToDictionary(self,key:str,value:int)->None:
         hashedKey=self.HashFunction(key)
         newNodeForDictionary=LinkedList()
-        newNodeForDictionary.addHead(value)
-        doesHashExist,indexOfHash=self.searchForHash(hashedKey)
+        newNodeForDictionary.addHead(key,value)
+        doesHashExist,indexOfHash=self.findIndexOfBucket(hashedKey)
 
         if not doesHashExist: #If -1 means is a new addition
-            self.listOfObjPosition.append(newNodeForDictionary) #We add the object reference to the appropiate list
-            self.listOfHashObj.append(hashedKey) # we save the hash to same position as the other list
+            self.listOfObj.append(newNodeForDictionary) #We add the object reference to the appropiate list
         else: #If exists, handle collition by adding a new linked list item
-            objFoundDictionaryNode= self.listOfObjPosition[indexOfHash] #Get the saved key linked list object from that collition
-            objFoundDictionaryNode.addTail(newNodeForDictionary)
+            objFoundDictionaryNode= self.listOfObj[indexOfHash] #Get the saved key linked list object from that collition
+            objFoundDictionaryNode.addTail(key,value)
 
     def getValue(self,key:str)->list:
         listOfValuesAssociatedWithKey=[]
         hashedKey=self.HashFunction(key)
-        doesHashExist,indexOfHash=self.searchForHash(hashedKey)
+        doesHashExist,indexOfHash=self.findIndexOfBucket(hashedKey)
         if not doesHashExist:
             raise IndexError("The key" + key +" does not exist in the dictionary!")
         else:
-            objFoundDictionaryNode= self.listOfObjPosition[indexOfHash] #Get the saved key linked list object from that collition
+            objFoundDictionaryNode= self.listOfObj[indexOfHash].head #Get the saved key linked list object from that collition
             while objFoundDictionaryNode!=None:
-                listOfValuesAssociatedWithKey.append(objFoundDictionaryNode.value)
-                objFoundDictionaryNode=objFoundDictionaryNode.next
+                if objFoundDictionaryNode.key==key:
+                    listOfValuesAssociatedWithKey.append(objFoundDictionaryNode.value)
+                objFoundDictionaryNode=objFoundDictionaryNode.Next
         return listOfValuesAssociatedWithKey
     
     def removeKey(self,key:str)->None:
         hashedKey=self.HashFunction(key)
-        doesHashExist,indexOfHash=self.searchForHash(hashedKey)
+        doesHashExist,indexOfHash=self.findIndexOfBucket(hashedKey)
 
         if not doesHashExist:
             raise IndexError("The key" + key +" does not exist in the dictionary!")
         else:
-            self.listOfObjPosition.remove(indexOfHash)
-            self.listOfHashObj.remove(hashedKey)
+            indexOfNode=0
+            objFoundDictionaryNode= self.listOfObj[indexOfHash].head #Get the saved key linked list object from that collition
+            placeHolderNode=None
+            while objFoundDictionaryNode!=None:
+                if objFoundDictionaryNode.key==key:
+                    placeHolderNode=objFoundDictionaryNode.Next
+                    self.listOfObj[indexOfHash].deleteAtIndex(indexOfNode)#Delete the nodes associated to that key on the hashmap
+                    objFoundDictionaryNode=placeHolderNode
+                    continue
+                objFoundDictionaryNode=objFoundDictionaryNode.Next
+                indexOfNode+=1
     
 
 
@@ -69,8 +78,16 @@ class PersonalDictionary:
 
 if __name__=="__main__":
     myOwnDictionary=PersonalDictionary()
-    myOwnDictionary.addToDictionary("Hola",4)
-    myOwnDictionary.addToDictionary("Hola",5)
+    myOwnDictionary.addToDictionary("ab",4)
+    myOwnDictionary.addToDictionary("ab",5)
+    myOwnDictionary.addToDictionary("ba",8)
+    myOwnDictionary.addToDictionary("Hola",7)
+    print(myOwnDictionary.getValue("ab"))
+    print(myOwnDictionary.getValue("ba"))
+    print(myOwnDictionary.getValue("Hola"))
+    myOwnDictionary.removeKey("ab")
+    print(myOwnDictionary.getValue("ab"))
+    print(myOwnDictionary.getValue("ba"))
     pass
 
 
@@ -118,13 +135,6 @@ Estás guardando el hash pero no la clave original.
 Si dos claves distintas producen el mismo hash (colisión), no podrías distinguirlas.
 
 Lo ideal es que en la linked list cada nodo guarde un (key, value), no solo value.
-
-Próximos métodos
-Ahora mismo solo tienes addToDictionary. Lo siguiente sería:
-
-getValue(key) → devolver el valor (o lista de valores) asociado a la clave.
-
-remove(key) → eliminar la clave.
 
 📌 Checklist de avance (para ti, no lo resuelvo, solo guío):
 
