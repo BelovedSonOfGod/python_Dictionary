@@ -5,6 +5,21 @@ class PersonalDictionary:
     def __init__(self):
         self.listOfObj=[]
 
+    def __str__(self)->str:
+        listOfBuckets=[]
+
+        for i,bucket in enumerate(self.listOfObj):
+            listOfNodes=[]
+            node=bucket.head
+            currentNode=node
+            while currentNode!=None:
+                listOfNodes.append(f"{currentNode.key} and {currentNode.value}")
+                currentNode=currentNode.Next
+            listOfBuckets.append(f"Bucket of object {node} with initial key head {node.key}: {listOfNodes}")
+
+        return "\n".join(listOfBuckets)
+
+
     def HashFunction(self,valToHash:str)->int:
         hashFunction=0
         for char in valToHash:
@@ -24,6 +39,20 @@ class PersonalDictionary:
 
 
 
+    def updateKeyInDictionary(self,createdLinkedListObject:LinkedList,linkedListObjectToReview:LinkedList)->None:
+        newIterableLinkedList=linkedListObjectToReview.head
+        if not isinstance(createdLinkedListObject,LinkedList) or not isinstance(linkedListObjectToReview,LinkedList):
+            raise TypeError("Object(s) received is not of type Linked list!!")
+        else:
+            while newIterableLinkedList != None:
+                if  newIterableLinkedList.key==createdLinkedListObject.head.key:
+                    newIterableLinkedList.value=createdLinkedListObject.head.value
+                    return
+                newIterableLinkedList=newIterableLinkedList.Next
+            #If no return it means it doesnt exist, so add it    
+            linkedListObjectToReview.addHead(createdLinkedListObject.head.key,createdLinkedListObject.head.value)
+
+
     def addToDictionary(self,key:str,value:int)->None:
         hashedKey=self.HashFunction(key)
         newNodeForDictionary=LinkedList()
@@ -34,7 +63,7 @@ class PersonalDictionary:
             self.listOfObj.append(newNodeForDictionary) #We add the object reference to the appropiate list
         else: #If exists, handle collition by adding a new linked list item
             objFoundDictionaryNode= self.listOfObj[indexOfHash] #Get the saved key linked list object from that collition
-            objFoundDictionaryNode.addTail(key,value)
+            self.updateKeyInDictionary(newNodeForDictionary,objFoundDictionaryNode)
 
     def getValue(self,key:str)->list:
         listOfValuesAssociatedWithKey=[]
@@ -85,9 +114,10 @@ if __name__=="__main__":
     print(myOwnDictionary.getValue("ab"))
     print(myOwnDictionary.getValue("ba"))
     print(myOwnDictionary.getValue("Hola"))
-    myOwnDictionary.removeKey("ab")
-    print(myOwnDictionary.getValue("ab"))
-    print(myOwnDictionary.getValue("ba"))
+    print(myOwnDictionary)
+    #myOwnDictionary.removeKey("ab")
+    #print(myOwnDictionary.getValue("ab"))
+    #print(myOwnDictionary.getValue("ba"))
     pass
 
 
